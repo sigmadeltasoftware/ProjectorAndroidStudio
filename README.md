@@ -1,4 +1,4 @@
-# JetBrains Projector with Android Studio
+# JetBrains Projector with Android Studio (On a local Ubuntu/Linux machine)
 
 Guide to setup JetBrains Projector and access Android Studio from any device.
 
@@ -7,45 +7,40 @@ Guide to setup JetBrains Projector and access Android Studio from any device.
 ![Android Studio on iPad Pro](ipad.jpg)
 *Android Studio on an iPad Pro*
 
-### Step 1: Spin up a Linux server
+### Step 1: Set up your host (the local powerhouse that will run the builds)
 
-This guide will explain how to get a virtual machine setup with Amazon AWS, but you can choose any other provider like Google Cloud or Microsoft Azure, or even a machine on your local network.
+1. Make sure the machine is fully set up and (local) network connectivity is available
+2. Enable SSH connectivity: https://linuxize.com/post/how-to-enable-ssh-on-ubuntu-18-04/
 
-1. Make a [AWS account](https://aws.amazon.com/free/) and login
-2. Go to the EC2 section and select create a new Instance
-3. Search for "Debian" in the AWS Marketplace and choose the latest Debian distribution (Debian 10 Buster at the time of writing)
-4. Pick the instance type, I suggest one with at least 8Gb RAM, preferrably more
-5. Click next until you get to storage, and choose how much storage you need. I suggest at least 20Gb (you can always expand this later)
-6. Click next until the security section, you need to add a new rule to be able to access the port that Projector will use
-* Add a new custom TCP rule with port 8888 (or any port you like, will be useful in the next step)
-* If you want to secure access, you can choose to only allow connections only from your own IP adress (recommended): Source > My Ip
-7. Choose or create a private key to access the instance and start it
-8. Write down the IP addresss (ipv4) shown in the EC2 console
+### Step 2: Generate SSH keys
 
-### Step 2: Connect to your remote server via SSH
+1. Use your available or generate new SSH keys: https://linuxize.com/post/how-to-set-up-ssh-keys-on-ubuntu-1804/ (just make sure your have something like local `~/.ssh/id_rsa` & `~/.ssh/id_rsa.pub` files)
+2. Copy the SSH key over to your host machine: `$ ssh-copy-id myuser@myhostname.local`
 
-1. To make it easy to connect to your instance, create a new file ~/.ssh/config (if it doesn't exist already)
-2. Add a new host to your ~/.ssh/config:
+### Step 2: Connect to your host via SSH
+
+1. Modify or create the ~/.ssh/config file on your client (the device you will access the host by)
+2. Add a new host-configuration to your ~/.ssh/config:
 ```
 Host {REMOTE_MACHINE_ALIAS}
   User {REMOTE_MACHINE_USERNAME}
   HostName {REMOTE_MACHINE_IP_OR_HOSTNAME}
   Port 22
-  IdentityFile ~/.ssh/{SSH_KEY_NAME}
+  IdentityFile ~/.ssh/{SSH_KEY_NAME} (SSH_KEY_NAME is likely id_rsa)
   PreferredAuthentications publickey
   ControlMaster auto
   ControlPath /tmp/%r@%h:%p
   ControlPersist 1h
 ```
-* `Host` - Choose an alias like `remote-builder` or anything you like
-* `User` - By default, the username for a Debian server is `admin`
-* `Hostname` - the IP address of your EC2 instance
-* `IdentityFile` - the path to your private key file downloaded when creating the EC2 instance
+* `Host` - Choose an alias like `powerhouse` or anything you like
+* `User` - The username you've set up on your host (f.e.: myuser)
+* `Hostname` - The hostname set up on your Ubuntu machine with `.local` suffix (f.e: myhostname.local)
+* `IdentityFile` - Path to the SSH file on your client device
 
 3. Now you can connect to your machine easily like this
 
 ```
-$ ssh remote-builder
+$ ssh powerhouse
 ```
 4. Once connected, you can now begin installing things on your remote server
 
@@ -111,7 +106,7 @@ $ adb kill-server
 $ adb devices
 List of devices attached
   ABCDEF12345
-$ ssh -R 5037:localhost:5037 remote-builder
+$ ssh -R 5037:localhost:5037 powerhouse
 ```
 4. This will connect to your instance with port forwarding enabled. Now check that the device is visible on the remote machine:
 ```
