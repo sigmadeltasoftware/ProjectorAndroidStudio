@@ -56,13 +56,19 @@ $ pip3 install projector-installer
 ```
 projector --help
 ```
+Should this command fail, it's possible you still need to add the bin directory to your PATH on your host machine. Modify the `~/.bashrc` or `~/.zshrc` file on your host machine and add the following line somewhere on the bottom:
+
+```
+$ export PATH=$PATH:/home/sigmadelta/.local/bin
+```
+
 3. At this point, you could run one of the pre-configured IDEs like IntelliJ and start using it, but to run Android Studio, you need to install it separately.
 4. Download the latest Android Studio 4.2 or above (4.2 is the minimum version that works with Projector)
 * Find the latest download URL for linux from https://developer.android.com/studio/archive. At the time of writing, the latest version is 4.2 Canary 16
 * Download it to your remote server in your home directory with curl: 
 
 ```
-$ curl --output android-studio.tar.gz https://redirector.gvt1.com/edgedl/android/studio/ide-zips/4.2.0.16/android-studio-ide-202.6939830-linux.tar.gz
+$ curl "https://r1---sn-5hnedn7z.gvt1.com/edgedl/android/studio/ide-zips/4.2.0.16/android-studio-ide-202.6939830-linux.tar.gz?mh=gV&mvi=1&pl=33&shardbypass=yes&redirect_counter=1&cm2rm=sn-uxaxoxu-cg0r7e&req_id=29c47d8c52741f82&cms_redirect=yes&ipbypass=yes&mip=2a02:1810:4d63:4600:a17d:37fb:9abd:d96f&mm=42&mn=sn-5hnedn7z&ms=onc&mt=1605264385&mv=m" --output android-studio.tar.gz
 ```
 * Unzip the downloaded archive:
 
@@ -76,12 +82,13 @@ Enter a new configuration name: AndroidStudio
 Do you want to choose a Projector-installed IDE? [y/n]: n
 Enter the path to IDE: /path/to/your/android-studio
 Enter a desired Projector port (press ENTER for default) [10005]: 8888
+Use secure connection (this option requires installing a projector's certificate to browser)? [y/n]: y (** You will need this if you want to make use of the clipboard to copy things from your host machine to your local clipboard when f.e. wanting to Google an error **)
+Would you like to set password for connection? [y/n]: n
 ```
-6. This will start Android Studio with Projector on port 8888. Next time you want to start it, you can just run:
 
-```
-$ projector run AndroidStudio
-```
+#### Certificate error
+During the creation of the certificate file, I got an error due to the fact that the projector script could not find the keytool inside of `android-studio/jbr/bin`. I've created a ticket to follow this up for now: https://youtrack.jetbrains.com/issue/PRJ-191
+
 
 ### Step 4: Access Android Studio from a Browser
 
